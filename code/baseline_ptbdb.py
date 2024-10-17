@@ -21,6 +21,9 @@ X = np.array(df_train[list(range(187))].values)[..., np.newaxis]
 Y_test = np.array(df_test[187].values).astype(np.int8)
 X_test = np.array(df_test[list(range(187))].values)[..., np.newaxis]
 
+print("X train:", np.shape(X), "Y train", np.shape(Y))
+print("X test:", np.shape(X_test), "Y test", np.shape(Y_test))
+print(Y_test[:20])
 
 def get_model():
     nclass = 1
@@ -54,7 +57,7 @@ def get_model():
     return model
 
 model = get_model()
-file_path = "baseline_cnn_ptbdb.h5"
+file_path = "baseline_cnn_ptbdb.keras"
 checkpoint = ModelCheckpoint(file_path, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
 early = EarlyStopping(monitor="val_acc", mode="max", patience=5, verbose=1)
 redonplat = ReduceLROnPlateau(monitor="val_acc", mode="max", patience=3, verbose=2)

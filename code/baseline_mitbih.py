@@ -6,7 +6,13 @@ from keras.callbacks import ModelCheckpoint, EarlyStopping, LearningRateSchedule
 from keras.layers import Dense, Input, Dropout, Convolution1D, MaxPool1D, GlobalMaxPool1D, GlobalAveragePooling1D, \
     concatenate
 from sklearn.metrics import f1_score, accuracy_score
+import matplotlib.pyplot as plt
+import time
 
+
+batch_sizes = [256, 32, 8, 1]
+
+#for batch_size in batch_sizes:
 
 df_train = pd.read_csv("../input/mitbih_train.csv", header=None)
 df_train = df_train.sample(frac=1)
@@ -18,6 +24,9 @@ X = np.array(df_train[list(range(187))].values)[..., np.newaxis]
 Y_test = np.array(df_test[187].values).astype(np.int8)
 X_test = np.array(df_test[list(range(187))].values)[..., np.newaxis]
 
+print("X train:", np.shape(X), "Y train", np.shape(Y))
+print("X test:", np.shape(X_test), "Y test", np.shape(Y_test))
+t1 = time.time()
 
 def get_model():
     nclass = 5
@@ -47,21 +56,23 @@ def get_model():
     opt = optimizers.Adam(0.001)
 
     model.compile(optimizer=opt, loss=losses.sparse_categorical_crossentropy, metrics=['acc'])
-    model.summary()
+    #model.summary()
     return model
 
 model = get_model()
-file_path = "baseline_cnn_mitbih.h5"
+file_path = "baseline_cnn_mitbih.keras"
 checkpoint = ModelCheckpoint(file_path, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
 early = EarlyStopping(monitor="val_acc", mode="max", patience=5, verbose=1)
 redonplat = ReduceLROnPlateau(monitor="val_acc", mode="max", patience=3, verbose=2)
 callbacks_list = [checkpoint, early, redonplat]  # early
 
-model.fit(X, Y, epochs=1000, verbose=2, callbacks=callbacks_list, validation_split=0.1)
+model.fit(X, Y, batch_size=256, epochs=1000, verbose=2, callbacks=callbacks_list, validation_split=0.1)
 model.load_weights(file_path)
 
 pred_test = model.predict(X_test)
 pred_test = np.argmax(pred_test, axis=-1)
+
+#print("\n\n\nBatch size: ", batch_size)
 
 f1 = f1_score(Y_test, pred_test, average="macro")
 
@@ -70,3 +81,6 @@ print("Test f1 score : %s "% f1)
 acc = accuracy_score(Y_test, pred_test)
 
 print("Test accuracy score : %s "% acc)
+
+t2 = time.time()
+print("Total time elapsed:", t2 - t1)

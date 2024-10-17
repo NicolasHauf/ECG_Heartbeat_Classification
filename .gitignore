@@ -97,8 +97,13 @@ venv.bak/
 # Rope project settings
 .ropeproject
 
+# Keras CNN files
+*.keras
+
 # mkdocs documentation
 /site
 
 # mypy
 .mypy_cache/
+
+input/

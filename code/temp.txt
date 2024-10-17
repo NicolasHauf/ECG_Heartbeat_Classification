@@ -1,0 +1,15 @@
+3.1.1 Segmenting and Labeling ECG Data 
+
+The ECG signals are continuous time-series data, and to classify individual beats, signals should be segmented into specific segments around each beat. Each ECG segment is extracted consisting of 1.2T, where T signifies the median of R-R time intervals in a local window which is 10 seconds long. The segment is padded so it consists of the predefined length of 187 samples. This ensures that we capture the full wave form of the ECG, including critical features like the P-wave, QRS complex, and T-wave. [6] 
+
+Then, each ECG segment is labeled based on the annotations provided in the dataset. These annotations are critical for supervised learning, as the models need these labels to learn patterns and classify beats accordingly. 
+
+Intuitively this system isolates the interval between the first heartbeat and where the second heartbeat is supposed to be. The critical information is then the distance to this second heartbeat if it exists in this interval, as well as the electrical activity between them. 
+
+3.1.2 Feature Extraction 
+
+(I am not sure if this order of subtopics is the best version) 
+
+To find the R-peak candidates and subsequently the R-R time intervals, the signal is normalized to values between 0 and 1.  The relevant peaks are found by selecting the local extreme points and applying a threshold of 0.9.  
+
+All R-peak candidates share a similar maximum value. Therefore, the normalized value for all of them is close to 1 and the threshold of 0.9 eliminates all non-R-peak extreme points. 
